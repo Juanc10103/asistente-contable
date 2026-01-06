@@ -1,688 +1,484 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es-AR">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="description"
-        content="Asistente interno para contadores que ayuda a responder consultas frecuentes de WhatsApp con mensajes listos para usar." />
-    <title>Asistente Contable Inteligente</title>
-    <style>
-        :root {
-            --bg: #0b1220;
-            --card: #0f1a2f;
-            --text: #e8eefc;
-            --muted: #b7c3dd;
-            --line: rgba(255, 255, 255, .12);
-            --accent: #ffb44d;
-            /* cálido */
-            --accent2: #ff7a59;
-            --shadow: 0 20px 50px rgba(0, 0, 0, .45);
-            --radius: 18px;
-            --max: 1040px;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Automatizá tu WhatsApp para responder consultas repetidas y derivar a humano cuando haga falta." />
+  <title>Automatización de WhatsApp | Asistente de Atención</title>
 
-        * {
-            box-sizing: border-box
-        }
-
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            background:
-                radial-gradient(800px 500px at 15% 10%, rgba(255, 180, 77, .14), transparent 55%),
-                radial-gradient(700px 450px at 85% 0%, rgba(255, 122, 89, .13), transparent 60%),
-                linear-gradient(180deg, var(--bg), #070b14 80%);
-            color: var(--text);
-            line-height: 1.5;
-        }
-
-        a {
-            color: inherit;
-            text-decoration: none
-        }
-
-        .container {
-            max-width: var(--max);
-            margin: 0 auto;
-            padding: 0 20px
-        }
-
-        .nav {
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            backdrop-filter: blur(10px);
-            background: rgba(7, 11, 20, .55);
-            border-bottom: 1px solid var(--line);
-        }
-
-        .nav-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 0;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            letter-spacing: .2px;
-        }
-
-        .logo {
-            width: 36px;
-            height: 36px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            box-shadow: 0 10px 25px rgba(255, 180, 77, .20);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 16px;
-            color: var(--muted);
-            font-size: 14px
-        }
-
-        .nav-links a {
-            padding: 8px 10px;
-            border-radius: 10px
-        }
-
-        .nav-links a:hover {
-            background: rgba(255, 255, 255, .06);
-            color: var(--text)
-        }
-
-        .hero {
-            padding: 56px 0 22px;
-        }
-
-        .hero-grid {
-            display: grid;
-            grid-template-columns: 1.15fr .85fr;
-            gap: 26px;
-            align-items: stretch;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            border: 1px solid var(--line);
-            border-radius: 999px;
-            color: var(--muted);
-            background: rgba(255, 255, 255, .04);
-            font-size: 13px;
-            width: fit-content;
-        }
-
-        .badge span {
-            width: 8px;
-            height: 8px;
-            border-radius: 99px;
-            background: var(--accent);
-            box-shadow: 0 0 0 4px rgba(255, 180, 77, .15);
-        }
-
-        h1 {
-            margin: 14px 0 10px;
-            font-size: clamp(30px, 4.3vw, 46px);
-            line-height: 1.12;
-            letter-spacing: -.4px;
-        }
-
-        .sub {
-            margin: 0 0 18px;
-            color: var(--muted);
-            font-size: clamp(15px, 1.7vw, 18px);
-            max-width: 60ch;
-        }
-
-        .cta-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin: 18px 0 6px
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 12px 16px;
-            border-radius: 14px;
-            border: 1px solid var(--line);
-            background: rgba(255, 255, 255, .05);
-            color: var(--text);
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform .08s ease, background .2s ease, border-color .2s ease;
-            min-width: 165px;
-        }
-
-        .btn:hover {
-            background: rgba(255, 255, 255, .08);
-            transform: translateY(-1px)
-        }
-
-        .btn.primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            border-color: transparent;
-            color: #1b1207;
-            box-shadow: 0 14px 35px rgba(255, 122, 89, .18);
-        }
-
-        .btn.primary:hover {
-            transform: translateY(-1px);
-            filter: saturate(1.05)
-        }
-
-        .fineprint {
-            margin: 10px 0 0;
-            color: rgba(183, 195, 221, .9);
-            font-size: 13px;
-        }
-
-        .card {
-            background: rgba(15, 26, 47, .78);
-            border: 1px solid var(--line);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .hero-card {
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            gap: 14px;
-        }
-
-        .hero-card h3 {
-            margin: 0;
-            font-size: 16px;
-            color: var(--text);
-            letter-spacing: .2px;
-        }
-
-        .hero-card p {
-            margin: 6px 0 0;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .ticks {
-            margin: 10px 0 0;
-            padding: 0;
-            list-style: none;
-            display: grid;
-            gap: 10px
-        }
-
-        .ticks li {
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-            padding: 10px 12px;
-            border: 1px solid rgba(255, 255, 255, .08);
-            background: rgba(255, 255, 255, .04);
-            border-radius: 14px;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 99px;
-            background: var(--accent);
-            margin-top: 5px;
-            flex: 0 0 auto;
-        }
-
-        .section {
-            padding: 34px 0
-        }
-
-        .section h2 {
-            margin: 0 0 10px;
-            font-size: clamp(22px, 3vw, 30px);
-            letter-spacing: -.2px;
-        }
-
-        .section p.lead {
-            margin: 0;
-            color: var(--muted);
-            max-width: 70ch
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .box {
-            padding: 16px;
-            border-radius: var(--radius);
-            border: 1px solid var(--line);
-            background: rgba(255, 255, 255, .04);
-        }
-
-        .box h3 {
-            margin: 0 0 8px;
-            font-size: 16px
-        }
-
-        .box ul {
-            margin: 0;
-            padding-left: 18px;
-            color: var(--muted)
-        }
-
-        .box li {
-            margin: 6px 0
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .step {
-            padding: 14px;
-            border-radius: var(--radius);
-            border: 1px solid var(--line);
-            background: rgba(255, 255, 255, .04);
-        }
-
-        .step .num {
-            display: inline-flex;
-            width: 28px;
-            height: 28px;
-            border-radius: 10px;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            background: rgba(255, 180, 77, .18);
-            color: var(--text);
-            border: 1px solid rgba(255, 180, 77, .25);
-        }
-
-        .step p {
-            margin: 10px 0 0;
-            color: var(--muted);
-            font-size: 14px
-        }
-
-        .video {
-            padding: 18px;
-        }
-
-        .video .frame {
-            border-radius: var(--radius);
-            border: 1px dashed rgba(255, 255, 255, .22);
-            background: rgba(255, 255, 255, .03);
-            aspect-ratio: 16/9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(183, 195, 221, .95);
-            text-align: center;
-            padding: 18px;
-        }
-
-        .price {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
-            align-items: stretch;
-        }
-
-        .price .big {
-            font-size: clamp(28px, 4vw, 40px);
-            font-weight: 800;
-            letter-spacing: -.5px;
-            margin: 2px 0 8px;
-        }
-
-        .price .muted {
-            color: var(--muted)
-        }
-
-        .price ul {
-            margin: 10px 0 0;
-            padding-left: 18px;
-            color: var(--muted)
-        }
-
-        .footer {
-            padding: 26px 0 36px;
-            border-top: 1px solid var(--line);
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        .pill {
-            display: inline-flex;
-            gap: 8px;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 999px;
-            border: 1px solid var(--line);
-            background: rgba(255, 255, 255, .04);
-            color: var(--muted);
-            font-size: 13px;
-        }
-
-        @media (max-width: 920px) {
-            .hero-grid {
-                grid-template-columns: 1fr;
-                gap: 14px
-            }
-
-            .steps {
-                grid-template-columns: 1fr 1fr
-            }
-
-            .grid-2 {
-                grid-template-columns: 1fr
-            }
-
-            .price {
-                grid-template-columns: 1fr
-            }
-
-            .nav-links {
-                display: none
-            }
-        }
-
-        @media (max-width: 520px) {
-            .steps {
-                grid-template-columns: 1fr
-            }
-
-            .btn {
-                min-width: 100%
-            }
-        }
-    </style>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a2f;
+      --text:#e8eefc;
+      --muted:#b7c3dd;
+      --line:rgba(255,255,255,.12);
+      --accent:#ffb44d;
+      --accent2:#ff7a59;
+      --shadow: 0 20px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+      --max: 1040px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(800px 500px at 15% 10%, rgba(255,180,77,.14), transparent 55%),
+        radial-gradient(700px 450px at 85% 0%, rgba(255,122,89,.13), transparent 60%),
+        linear-gradient(180deg, var(--bg), #070b14 80%);
+      color:var(--text);
+      line-height:1.5;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--max); margin:0 auto; padding:0 20px}
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(7,11,20,.55);
+      border-bottom:1px solid var(--line);
+    }
+    .nav{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .logo{
+      width:36px; height:36px; border-radius:12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: 0 10px 25px rgba(255,180,77,.20);
+      flex:0 0 auto;
+    }
+    nav a{
+      font-size:14px; color:var(--muted);
+      padding:8px 10px; border-radius:10px;
+    }
+    nav a:hover{background:rgba(255,255,255,.06); color:var(--text)}
+    .hero{padding:56px 0 20px}
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:26px;
+      align-items:stretch;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:var(--muted);
+      background: rgba(255,255,255,.04);
+      font-size:13px;
+      width:fit-content;
+    }
+    .badge span{
+      width:8px; height:8px; border-radius:99px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255,180,77,.15);
+    }
+    h1{
+      margin:14px 0 10px;
+      font-size: clamp(30px, 4.3vw, 46px);
+      line-height:1.12;
+      letter-spacing:-.4px;
+    }
+    .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size: clamp(15px, 1.7vw, 18px);
+      max-width: 60ch;
+    }
+    .cta-row{display:flex; flex-wrap:wrap; gap:12px; margin:18px 0 8px}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      min-width: 175px;
+    }
+    .btn:hover{background: rgba(255,255,255,.08); transform: translateY(-1px)}
+    .btn.primary{
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-color: transparent;
+      color:#1b1207;
+      box-shadow: 0 14px 35px rgba(255,122,89,.18);
+    }
+    .btn.primary:hover{transform: translateY(-1px); filter:saturate(1.05)}
+    .fineprint{
+      margin:8px 0 0;
+      color: rgba(183,195,221,.9);
+      font-size: 13px;
+    }
+    .card{
+      background: rgba(15,26,47,.78);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero-card{
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .hero-card h3{margin:0; font-size:16px; letter-spacing:.2px}
+    .hero-card p{margin:6px 0 0; color:var(--muted); font-size:14px}
+    .ticks{margin:10px 0 0; padding:0; list-style:none; display:grid; gap:10px}
+    .ticks li{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      border-radius: 14px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:99px;
+      background: var(--accent);
+      margin-top:5px;
+      flex: 0 0 auto;
+    }
+    section{padding:34px 0}
+    h2{
+      margin:0 0 10px;
+      font-size: clamp(22px, 3vw, 30px);
+      letter-spacing:-.2px;
+    }
+    p.lead{margin:0; color:var(--muted); max-width:75ch}
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    .box{
+      padding:16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+    .box h3{margin:0 0 8px; font-size:16px}
+    .box ul{margin:0; padding-left:18px; color:var(--muted)}
+    .box li{margin:6px 0}
+    .steps{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:12px;
+      margin-top:16px;
+    }
+    .step{
+      padding:14px;
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+    .step .num{
+      display:inline-flex;
+      width:28px; height:28px;
+      border-radius:10px;
+      align-items:center; justify-content:center;
+      font-weight:800;
+      background: rgba(255,180,77,.18);
+      border:1px solid rgba(255,180,77,.25);
+    }
+    .step p{margin:10px 0 0; color:var(--muted); font-size:14px}
+    .video{padding:18px}
+    .frame{
+      border-radius: var(--radius);
+      border:1px dashed rgba(255,255,255,.22);
+      background: rgba(255,255,255,.03);
+      aspect-ratio: 16/9;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(183,195,221,.95);
+      text-align:center;
+      padding: 18px;
+    }
+    .price{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      margin-top:16px;
+    }
+    .big{
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight:900;
+      letter-spacing:-.5px;
+      margin:2px 0 8px;
+    }
+    footer{
+      padding:26px 0 36px;
+      border-top:1px solid var(--line);
+      color: var(--muted);
+      font-size:13px;
+    }
+    @media (max-width: 920px){
+      .hero-grid{grid-template-columns:1fr; gap:14px}
+      .steps{grid-template-columns:1fr 1fr}
+      .grid-2{grid-template-columns:1fr}
+      .price{grid-template-columns:1fr}
+      nav{display:none}
+    }
+    @media (max-width: 520px){
+      .steps{grid-template-columns:1fr}
+      .btn{min-width:100%}
+    }
+  </style>
 </head>
 
 <body>
-    <header class="nav">
-        <div class="container nav-inner">
-            <div class="brand">
-                <div class="logo" aria-hidden="true"></div>
-                <div>
-                    Asistente Contable <span style="color:var(--muted); font-weight:600;">Inteligente</span>
-                </div>
-            </div>
-            <nav class="nav-links" aria-label="Navegación">
-                <a href="#como-funciona">Cómo funciona</a>
-                <a href="#que-resuelve">Qué resuelve</a>
-                <a href="#demo">Demo</a>
-                <a href="#precio">Precio</a>
-            </nav>
+  <header>
+    <div class="container nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>Asistente de WhatsApp <span style="color:var(--muted); font-weight:700;">(Atención Automática)</span></div>
+      </div>
+      <nav aria-label="Navegación">
+        <a href="#como-funciona">Cómo funciona</a>
+        <a href="#incluye">Qué incluye</a>
+        <a href="#demo">Demo</a>
+        <a href="#precio">Precio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="badge"><span></span> Para profesionales y empresas de servicios</div>
+          <h1>Automatizá tu WhatsApp y dejá de responder siempre lo mismo</h1>
+          <p class="sub">
+            Un asistente que responde consultas repetidas y te avisa cuando hace falta que intervengas.
+            Menos interrupciones, más foco y mejor atención.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn primary" href="#demo">Ver demo</a>
+
+            <!-- Cambiá el texto si querés; tu número ya está puesto -->
+            <a class="btn" href="https://wa.me/5493855749624?text=Hola%2C%20vi%20la%20demo%20del%20Asistente%20de%20WhatsApp%20y%20quiero%20más%20información" target="_blank" rel="noopener">
+              Hablar por WhatsApp
+            </a>
+          </div>
+
+          <p class="fineprint">
+            *Esto es un servicio de implementación y mantenimiento. Vos mantenés el control: el asistente no toma decisiones complejas.
+          </p>
         </div>
-    </header>
 
-    <main>
-        <!-- HERO -->
-        <section class="hero">
-            <div class="container hero-grid">
-                <div>
-                    <div class="badge"><span></span> Para contadores y estudios contables (Argentina)</div>
-                    <h1>Respondé consultas contables más rápido, sin pensar qué escribir</h1>
-                    <p class="sub">
-                        Un asistente interno que te ayuda a responder consultas frecuentes de WhatsApp con mensajes
-                        claros,
-                        profesionales y listos para usar. No reemplaza tu trabajo: te ahorra tiempo y desgaste.
-                    </p>
+        <aside class="card hero-card">
+          <div>
+            <h3>Ideal si WhatsApp te pasa esto</h3>
+            <p>Consultas repetidas, interrupciones constantes y poco tiempo para responder prolijo.</p>
 
-                    <div class="cta-row">
-                        <!-- Reemplazá #demo por el link del video o ancla donde esté el video -->
-                        <a class="btn primary" href="#demo">Ver demo</a>
-                        <!-- Reemplazá el link de WhatsApp con tu número -->
-                        <a class="btn" href="https://wa.me/5493855749624?text=Hola%2C%20vi%20la%20demo%20del%20Asistente%20Contable%20y%20quiero%20más%20información
-" target="_blank" rel="noopener">
-                            Hablar por WhatsApp
-                        </a>
-                    </div>
+            <ul class="ticks">
+              <li><span class="dot"></span><div><strong>Responde lo repetitivo</strong><br><span style="color:var(--muted)">Preguntas frecuentes, horarios, requisitos, precios base, etc.</span></div></li>
+              <li><span class="dot"></span><div><strong>Deriva a humano</strong><br><span style="color:var(--muted)">Si es complejo, no responde y te avisa.</span></div></li>
+              <li><span class="dot"></span><div><strong>Atención 24/7</strong><br><span style="color:var(--muted)">El cliente recibe respuesta rápida, incluso fuera de horario.</span></div></li>
+            </ul>
+          </div>
 
-                    <p class="fineprint">
-                        *Funciona dentro de la plataforma ChatGPT (requiere suscripción mensual aparte para usar
-                        asistentes personalizados).
-                    </p>
-                </div>
+          <div style="border-top:1px solid var(--line); padding-top:12px; color:var(--muted); font-size:13px">
+            <strong style="color:var(--text)">En 1 frase:</strong> automatizo lo repetitivo para que vos intervengas solo cuando hace falta.
+          </div>
+        </aside>
+      </div>
+    </section>
 
-                <aside class="card hero-card">
-                    <div>
-                        <h3>Ideal si te pasa esto</h3>
-                        <p>Consultas repetidas, WhatsApp todo el día, poco tiempo y cansancio para redactar respuestas
-                            prolijas.</p>
-                        <ul class="ticks">
-                            <li><span class="dot"></span>
-                                <div><strong>Ahorra tiempo</strong><br><span style="color:var(--muted)">Respuestas base
-                                        listas para copiar, pegar y adaptar.</span></div>
-                            </li>
-                            <li><span class="dot"></span>
-                                <div><strong>Límites profesionales</strong><br><span style="color:var(--muted)">No toma
-                                        decisiones impositivas ni se la juega en casos complejos.</span></div>
-                            </li>
-                            <li><span class="dot"></span>
-                                <div><strong>Uso simple</strong><br><span style="color:var(--muted)">Sin
-                                        configuraciones. Lo usás cuando lo necesitás.</span></div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="pill" style="justify-content:space-between;">
-                        <span>Hecho para trabajar</span>
-                        <span style="color:var(--text); font-weight:700;">no para explicar</span>
-                    </div>
-                </aside>
+    <!-- PROBLEMA -->
+    <section id="problema">
+      <div class="container">
+        <h2>WhatsApp no debería interrumpir tu trabajo todo el día</h2>
+        <p class="lead">
+          El problema no es atender clientes. El problema es atender lo repetitivo: las mismas preguntas una y otra vez,
+          responder apurado y perder foco.
+        </p>
+
+        <div class="grid-2">
+          <div class="box">
+            <h3>Te pasa esto</h3>
+            <ul>
+              <li>Consultas repetidas todos los días.</li>
+              <li>Interrupciones constantes y pérdida de foco.</li>
+              <li>Respuestas apuradas o inconsistentes.</li>
+              <li>Cansancio mental por “estar siempre”.</li>
+            </ul>
+          </div>
+
+          <div class="box">
+            <h3>Lo que cambia</h3>
+            <ul>
+              <li>Respuestas inmediatas a lo frecuente.</li>
+              <li>Vos atendés solo lo importante.</li>
+              <li>Mejor experiencia del cliente.</li>
+              <li>Menos desgaste y más tiempo real.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CÓMO FUNCIONA -->
+    <section id="como-funciona">
+      <div class="container">
+        <h2>Cómo funciona</h2>
+        <p class="lead">
+          No es “un bot que hace cualquiera”. Está diseñado con límites: responde lo frecuente y deriva lo complejo.
+        </p>
+
+        <div class="steps">
+          <div class="step">
+            <div class="num">1</div>
+            <p>Llega un mensaje por WhatsApp.</p>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <p>Si es consulta frecuente → responde solo.</p>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <p>Si es compleja → no responde y te avisa.</p>
+          </div>
+          <div class="step">
+            <div class="num">4</div>
+            <p>Guardamos el registro y mejoramos respuestas.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUÉ INCLUYE -->
+    <section id="incluye">
+      <div class="container">
+        <h2>Qué incluye</h2>
+        <p class="lead">Una implementación lista para usar, con personalización y ajustes básicos post puesta en marcha.</p>
+
+        <div class="grid-2">
+          <div class="box">
+            <h3>Incluido</h3>
+            <ul>
+              <li>Respuestas automáticas a consultas frecuentes.</li>
+              <li>Clasificación de mensajes (simple vs. requiere humano).</li>
+              <li>Derivación a humano cuando corresponde.</li>
+              <li>Mensajes personalizados a tu negocio.</li>
+              <li>Configuración inicial completa.</li>
+              <li>Ajustes básicos post-implementación.</li>
+            </ul>
+          </div>
+          <div class="box">
+            <h3>Qué NO hace (a propósito)</h3>
+            <ul>
+              <li>No toma decisiones ni “se la juega”.</li>
+              <li>No reemplaza tu atención humana.</li>
+              <li>No responde casos complejos sin tu intervención.</li>
+              <li>No hace marketing ni campañas publicitarias.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEMO -->
+    <section id="demo">
+      <div class="container">
+        <h2>Demo</h2>
+        <p class="lead">
+          Mirá cómo responde mensajes reales de WhatsApp: consulta repetida, mensaje desordenado y un caso donde deriva a humano.
+        </p>
+
+        <div class="card video" style="margin-top:16px;">
+          <div class="frame">
+            <div>
+              <strong>Insertá acá tu video demo</strong><br />
+              <span style="color:rgba(183,195,221,.9)">
+                Reemplazá este bloque por un iframe de YouTube “No listado” o un video embebido.
+              </span>
+              <div style="margin-top:14px;">
+                <span style="display:inline-block; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:13px;">
+                  Tip: YouTube “No listado”
+                </span>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
 
-        <!-- PROBLEMA -->
-        <section id="que-resuelve" class="section">
-            <div class="container">
-                <h2>El problema no es la información. Es el desgaste diario.</h2>
-                <p class="lead">
-                    Si sos contador, probablemente recibís las mismas consultas todos los días. WhatsApp interrumpe tu
-                    trabajo,
-                    cuesta redactar bien cuando estás cansado y terminás respondiendo “a las apuradas”.
-                </p>
+        <div class="cta-row" style="margin-top:16px;">
+          <a class="btn primary" href="https://wa.me/5493855749624?text=Hola%2C%20vi%20la%20demo%20y%20quiero%20que%20me%20cuentes%20cómo%20funciona%20para%20mi%20negocio" target="_blank" rel="noopener">
+            Quiero implementarlo
+          </a>
+          <a class="btn" href="#precio">Ver precio</a>
+        </div>
+      </div>
+    </section>
 
-                <div class="grid-2">
-                    <div class="box">
-                        <h3>Te pasa esto</h3>
-                        <ul>
-                            <li>Consultas repetidas (monotributo, AFIP, documentación).</li>
-                            <li>Mucho tiempo perdido redactando respuestas.</li>
-                            <li>Mensajes desordenados que te sacan del foco.</li>
-                            <li>Cansancio mental por responder lo mismo.</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>Lo que resuelve</h3>
-                        <ul>
-                            <li>Respuestas claras y profesionales en segundos.</li>
-                            <li>Formato listo para WhatsApp o email.</li>
-                            <li>Límites: no se mete donde no debe.</li>
-                            <li>Vos mantenés el control y el criterio.</li>
-                        </ul>
-                    </div>
-                </div>
+    <!-- PRECIO -->
+    <section id="precio">
+      <div class="container">
+        <h2>Precio</h2>
+        <p class="lead">Setup único + mensualidad (mantenimiento y ajustes). Sin contratos largos.</p>
+
+        <div class="price">
+          <div class="card" style="padding:18px;">
+            <div style="display:inline-block; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:13px;">
+              Recomendado
             </div>
-        </section>
+            <div class="big">Setup + mensualidad</div>
+            <p style="margin:0; color:var(--muted)">
+              Te paso cotización exacta según tu caso (cantidad de preguntas frecuentes, horarios, y derivación).
+            </p>
+            <ul style="color:var(--muted); padding-left:18px; margin:12px 0 0">
+              <li>Implementación y personalización</li>
+              <li>Pruebas y puesta en marcha</li>
+              <li>Soporte y ajustes básicos</li>
+            </ul>
+          </div>
 
-        <!-- CÓMO FUNCIONA -->
-        <section id="como-funciona" class="section">
-            <div class="container">
-                <h2>Cómo funciona (en 4 pasos)</h2>
-                <p class="lead">
-                    Nada de sistemas complicados. Solo lo usás como apoyo interno cuando te llega una consulta.
-                </p>
-
-                <div class="steps">
-                    <div class="step">
-                        <div class="num">1</div>
-                        <p>Copiás el mensaje del cliente.</p>
-                    </div>
-                    <div class="step">
-                        <div class="num">2</div>
-                        <p>Lo pegás en el asistente.</p>
-                    </div>
-                    <div class="step">
-                        <div class="num">3</div>
-                        <p>Te devuelve una respuesta clara y profesional.</p>
-                    </div>
-                    <div class="step">
-                        <div class="num">4</div>
-                        <p>Copiás, adaptás si querés y enviás.</p>
-                    </div>
-                </div>
+          <div class="card" style="padding:18px;">
+            <h3 style="margin:0 0 6px;">¿Querés que WhatsApp deje de interrumpirte?</h3>
+            <p style="margin:0 0 12px; color:var(--muted)">
+              Escribime y te hago 3 preguntas para cotizarte y mostrarte una demo aplicada a tu rubro.
+            </p>
+            <div class="cta-row" style="margin:0;">
+              <a class="btn primary" href="https://wa.me/5493855749624?text=Hola%2C%20quiero%20cotizar%20la%20automatización%20de%20WhatsApp%20para%20mi%20negocio" target="_blank" rel="noopener">
+                Cotizar por WhatsApp
+              </a>
+              <a class="btn" href="#incluye">Qué incluye</a>
             </div>
-        </section>
 
-        <!-- QUÉ RESPONDE / LÍMITES -->
-        <section class="section">
-            <div class="container">
-                <h2>Qué tipo de consultas te ayuda a responder</h2>
-                <p class="lead">
-                    Enfocado en lo repetitivo del día a día. Los casos complejos siguen siendo tu criterio profesional.
-                </p>
+            <p class="fineprint" style="margin-top:12px;">
+              Nota: si más adelante querés, se puede integrar con planillas/CRM/reportes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-                <div class="grid-2">
-                    <div class="box">
-                        <h3>Incluye</h3>
-                        <ul>
-                            <li>Monotributo (alta, requisitos, categorías – general).</li>
-                            <li>Trámites básicos de AFIP.</li>
-                            <li>Documentación habitual para nuevos clientes.</li>
-                            <li>Explicaciones simples y mensajes modelo.</li>
-                        </ul>
-                    </div>
-                    <div class="box">
-                        <h3>Límites profesionales</h3>
-                        <ul>
-                            <li>No toma decisiones impositivas por vos.</li>
-                            <li>No indica montos exactos ni se arriesga.</li>
-                            <li>Deriva cuando el caso requiere análisis puntual.</li>
-                            <li>Vos mantenés el control en todo momento.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <footer>
+      <div class="container" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center;">
+        <div>© <span id="year"></span> Automatización de WhatsApp — Santiago del Estero</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <span style="display:inline-block; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:13px;">Servicio</span>
+          <span style="display:inline-block; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:13px;">Respuesta + derivación</span>
+          <span style="display:inline-block; padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); font-size:13px;">24/7</span>
+        </div>
+      </div>
+    </footer>
+  </main>
 
-        <!-- DEMO -->
-        <section id="demo" class="section">
-            <div class="container">
-                <h2>Demo (2–3 minutos)</h2>
-                <p class="lead">
-                    Mirá cómo se usa con ejemplos reales: consulta típica, mensaje de WhatsApp y un caso donde el
-                    asistente frena por límites profesionales.
-                </p>
-
-                <div class="card video" style="margin-top:16px;">
-                    <div class="frame">
-                        <div>
-                            <strong>Insertá acá tu video demo</strong><br />
-                            <span style="color:rgba(183,195,221,.9)">
-                                Podés reemplazar este bloque por un iframe de YouTube (no listado) o un video embebido.
-                            </span>
-                            <div style="margin-top:14px;">
-                                <span class="pill">Tip: usá YouTube “No listado”</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ACCESO / REQUISITO -->
-        <section class="section">
-            <div class="container">
-                <h2>Cómo se accede</h2>
-                <p class="lead">
-                    El asistente funciona dentro de la plataforma ChatGPT, que requiere una suscripción mensual aparte
-                    para usar asistentes personalizados.
-                    Esa suscripción se paga directo a la plataforma.
-                </p>
-            </div>
-        </section>
-
-        <!-- PRECIO -->
-        <section id="precio" class="section">
-            <div class="container">
-                <h2>Precio</h2>
-                <p class="lead">Pago único. Sin mensualidad conmigo. Simple, claro y listo para usar.</p>
-
-                <div class="price">
-                    <div class="card" style="padding:18px;">
-                        <div class="pill">Pago único</div>
-                        <div class="big">$35.000 ARS</div>
-                        <div class="muted">Incluye configuración completa y ajustes básicos.</div>
-                        <ul>
-                            <li>Acceso al asistente</li>
-                            <li>Configuración lista para usar</li>
-                            <li>Ejemplos de preguntas</li>
-                            <li>Acompañamiento inicial</li>
-                        </ul>
-                    </div>
-
-                    <div class="card" style="padding:18px;">
-                        <div class="pill">Siguiente paso</div>
-                        <h3 style="margin:10px 0 6px;">¿Querés ahorrar tiempo desde esta semana?</h3>
-                        <p class="muted" style="margin:0 0 12px;">
-                            Mirá la demo y escribime. Te respondo rápido y coordinamos.
-                        </p>
-                        <div class="cta-row" style="margin:0;">
-                            <a class="btn primary" href="#demo">Ver demo</a>
-                            <a class="btn" href="https://wa.me/5493855749624?text=Hola%2C%20vi%20la%20demo%20del%20Asistente%20Contable%20y%20quiero%20más%20información
-" target="_blank" rel="noopener">
-                                Escribirme por WhatsApp
-                            </a>
-                        </div>
-
-                        <p class="fineprint" style="margin-top:12px;">
-                            Nota: A futuro, el asistente puede evolucionar a una solución más automatizada si lo
-                            necesitás.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <div class="container"
-                style="display:flex; flex-wrap:wrap; gap:10px; justify-content:space-between; align-items:center;">
-                <div>© <span id="year"></span> Asistente Contable Inteligente — Santiago del Estero</div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <span class="pill">Privado • Uso interno</span>
-                    <span class="pill">Mensajes listos</span>
-                    <span class="pill">Límites profesionales</span>
-                </div>
-            </div>
-        </footer>
-    </main>
-
-    <script>
-        // Año automático
-        document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
-
 </html>
